@@ -1,0 +1,44 @@
+.popup {
+    position: fixed; /* Change to fixed */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Ensure it's on top */
+  }
+  
+  .popup-inner {
+    background: rgb(255, 255, 255);
+    box-sizing: border-box;
+    padding: 20px;
+    border-radius: 10px;
+    width: 400px;
+    max-width: 80%;
+    min-height: 200px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    z-index: 1001; /* Ensure it's on top of the overlay */
+  }  
+
+  input{
+    width: 100%;
+  }
+
+ 
+  
+  .formDiv form input{
+    all:unset;
+    border: 5px solid #ababff;
+    padding: 5px;
+    margin-bottom: 5px;
+    background-color: #d6d6fa;
+    width: -webkit-fill-available;
+  }
+
+  .formButton-Div{
+    display: flex;
+    justify-content: space-between;
+  }
