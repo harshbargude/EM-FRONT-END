@@ -8,7 +8,7 @@ const AddEmployeeForm = ({ onClose }) => {
     const [phone, setPhone] = useState("");
 
 
-
+    const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
     const handleSubmit = (event) => {
         event.preventDefault();
         console.log("Form submitted");
@@ -17,7 +17,7 @@ const AddEmployeeForm = ({ onClose }) => {
         //database
         const New_employee = { name, email, phone };
         console.log(New_employee);
-        fetch("http://localhost:8090/employees", {
+        fetch(`${apiUrl}/employees`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(New_employee),
