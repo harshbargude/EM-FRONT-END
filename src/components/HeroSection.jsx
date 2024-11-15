@@ -23,12 +23,24 @@ const Hero = () => {
         setShowPopupE(false);
         setSelectedEmployee(null);
     };
-
+    const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
+    // console.log(`${apiUrl}`);
+    // var process;
     useEffect(() => {
-        fetch("http://localhost:8090/employees")
-            .then((res) => res.json())
-            .then((result) => setEmployees(result));
-    }, []); // Dependency array to avoid infinite loop
+        
+        
+        fetch(`${apiUrl}/employees`)
+            .then((res) => {
+                if (!res.ok) {
+                    throw new Error(`Network response was not ok. Status: ${res.status}`);
+                }
+                return res.json();
+            })
+            .then((result) => setEmployees(result))
+            .catch((error) => {
+                console.error("Error fetching employees:", error);
+            });
+    }, []);
 
     const handleEditClick = (employee) => {
         setSelectedEmployee(employee);
@@ -36,44 +48,44 @@ const Hero = () => {
     };
 
     const handleDeleteClick = (id) => {
-        fetch(`http://localhost:8090/employees/${id}`, {
+        fetch(`${apiUrl}/employees/${id}`, {
             method: "DELETE",
-        }).then(() => {
-            setEmployees(employees.filter((employee) => employee.id !== id));
-        });
+        })
+            .then(() => {
+                setEmployees(employees.filter((employee) => employee.id !== id));
+            })
+            .catch((error) => console.error("Error deleting employee:", error));
     };
 
     const handleFormSubmit = (updatedEmployee) => {
-        if (selectedEmployee) {
-            fetch(`http://localhost:8090/employees/${updatedEmployee.id}`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(updatedEmployee),
-            }).then(() => {
-                setEmployees((prev) =>
-                    prev.map((emp) =>
-                        emp.id === updatedEmployee.id ? updatedEmployee : emp
-                    )
-                );
-            });
-        } else {
-            fetch("http://localhost:8090/employees", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(updatedEmployee),
-            })
-                .then((res) => res.json())
-                .then((newEmployee) => {
-                    setEmployees([...employees, newEmployee]);
-                });
-        }
+        const url = selectedEmployee
+            ? `${apiUrl}/employees/${updatedEmployee.id}`
+            : `${apiUrl}/employees`;
 
-        handleClosePopup();
-        handleClosePopupE();
+        const method = selectedEmployee ? "PUT" : "POST";
+
+        fetch(url, {
+            method,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(updatedEmployee),
+        })
+            .then((res) => res.json())
+            .then((responseEmployee) => {
+                if (selectedEmployee) {
+                    setEmployees((prev) =>
+                        prev.map((emp) =>
+                            emp.id === responseEmployee.id ? responseEmployee : emp
+                        )
+                    );
+                } else {
+                    setEmployees((prev) => [...prev, responseEmployee]);
+                }
+                handleClosePopup();
+                handleClosePopupE();
+            })
+            .catch((error) => console.error("Error updating/adding employee:", error));
     };
 
     return (
@@ -120,33 +132,29 @@ const Hero = () => {
                                     <td>{employee.phone}</td>
                                     <td>{employee.email}</td>
                                     <td className="ActionBtn">
-                                        <div>
-                                            <button onClick={() => handleEditClick(employee)} >
-                                                <FontAwesomeIcon icon={faEdit} />
-                                            </button>
-                                            {showPopupE &&
-                                                (
-                                                    <EditEmployee 
-                                                        employee={selectedEmployee}
-                                                        onClose={handleClosePopupE}
-                                                        onSubmit={handleFormSubmit} 
-                                                    />
-                                                )}
-                                        </div>
-                                        <div>
-                                            <button onClick={() => handleDeleteClick(employee.id)}>
-                                                <FontAwesomeIcon icon={faTrash} />
-                                            </button>
-                                        </div>
+                                        <button onClick={() => handleEditClick(employee)}>
+                                            <FontAwesomeIcon icon={faEdit} />
+                                        </button>
+                                        <button onClick={() => handleDeleteClick(employee.id)}>
+                                            <FontAwesomeIcon icon={faTrash} />
+                                        </button>
                                     </td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
                 </div>
+                {showPopupE && (
+                    <EditEmployee
+                        employee={selectedEmployee}
+                        onClose={handleClosePopupE}
+                        onSubmit={handleFormSubmit}
+                    />
+                )}
             </div>
         </div>
     );
 };
 
 export default Hero;
+

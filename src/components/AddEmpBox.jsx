@@ -17,7 +17,7 @@ const AddEmployeeForm = ({ onClose }) => {
         //database
         const New_employee = { name, email, phone };
         console.log(New_employee);
-        fetch("https://employeeeem-project.onrender.com/employees", {
+        fetch("http://localhost:8090/employees", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(New_employee),
